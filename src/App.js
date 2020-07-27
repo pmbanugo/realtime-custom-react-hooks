@@ -1,26 +1,49 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import "./App.css";
+import Hamoni from "hamoni-sync";
 
-function App() {
+import Header from "./components/Header";
+import Table from "./components/Table";
+import Form from "./components/Form";
+
+export const HamoniContext = React.createContext({});
+
+const App = () => {
+  const accountId = "REPLACE_WITH_ACCOUNT_ID";
+  const appId = "REPLACE_WITH_APP_ID";
+  const [hamoni, setHamoni] = useState();
+
+  useEffect(() => {
+    const initialiseHamoniSync = async () => {
+      // recommended to generate this from your backend and send to your client apps.
+      const response = await fetch("https://api.sync.hamoni.tech/v1/token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json; charset=utf-8",
+        },
+        body: JSON.stringify({ accountId, appId }),
+      });
+
+      const token = await response.json();
+      const hamoniSync = new Hamoni(token);
+      await hamoniSync.connect();
+
+      setHamoni(hamoniSync);
+    };
+
+    initialiseHamoniSync();
+  }, [accountId, appId]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <HamoniContext.Provider value={hamoni}>
+      <div className="App">
+        <Header />
+        <Form />
+        <br />
+        <Table />
+      </div>
+    </HamoniContext.Provider>
   );
-}
+};
 
 export default App;
