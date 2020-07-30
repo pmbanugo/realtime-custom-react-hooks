@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from "react";
-import { HamoniContext } from "../App";
+import HamoniContext from "../HamoniContext";
 
 function useSyncState(name) {
   const hamoni = useContext(HamoniContext);
